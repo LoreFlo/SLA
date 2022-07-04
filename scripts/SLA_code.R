@@ -90,3 +90,9 @@ group_by(tricomas, ciudad) %>%
     IQR = IQR(total, na.rm = T)
   )
 
+
+
+
+
+
+
