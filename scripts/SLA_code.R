@@ -4,10 +4,20 @@
 
 # Cargar bases
 
+
+#install.packages("googledrive")
+#install.packages("googlesheets4")
+
+library("googledrive")
+library("googlesheets4")
 library(readxl)
 
-peso_seco <- read_excel("./data/peso_seco_accesorias.xlsx")
-tricomas <- read_excel("./data/TRICOMA_LORENA.xlsx")
+drive_auth()
+drive_find(n_max = 30)
+
+# código en proceso
+
+
 
 head(peso_seco)
 
@@ -93,4 +103,3 @@ group_by(tricomas, ciudad) %>%
 
 
 
-# prueba con git
