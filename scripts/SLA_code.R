@@ -7,15 +7,24 @@
 
 #install.packages("googledrive")
 #install.packages("googlesheets4")
+#install.packages("devtools")
 
-library("googledrive")
-library("googlesheets4")
+library(googledrive)
 library(readxl)
+library(devtools)
+devtools::install_github("tidyverse/googlesheets4")
+library(googlesheets4)
 
-drive_auth()
-drive_find(n_max = 30)
 
-# código en proceso
+#googledrive::drive_token()->acceso # generar token
+#saveRDS(acceso,"acceso_go.rds")    #almacenar token en un .rds
+
+#drive_auth(token = readRDS("acceso_go.rds")) 
+# esta linea se debe correr en los proximos inicios de proyecto
+
+
+
+# código en proceso. Necesito convertir a csv para continuar
 
 
 
