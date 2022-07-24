@@ -4,29 +4,16 @@
 
 # Cargar bases
 
+getwd()
+library(readxl)
+tricomas <- read_xlsx("./db/TRICOMA_LORENA.xlsx")
 
 #install.packages("googledrive")
 #install.packages("googlesheets4")
-#install.packages("devtools")
-
-library(googledrive)
-library(readxl)
-library(devtools)
-devtools::install_github("tidyverse/googlesheets4")
-library(googlesheets4)
-
-
-#googledrive::drive_token()->acceso # generar token
-#saveRDS(acceso,"acceso_go.rds")    #almacenar token en un .rds
-
-#drive_auth(token = readRDS("acceso_go.rds")) 
-# esta linea se debe correr en los proximos inicios de proyecto
-
-
-
+#library(googlesheets4)
+#leer base de datos desde un google sheet
+#x <- read_sheet('https://docs.google.com/spreadsheets/d/15qjj8LPQstf_vaI0A3xTrmIB4Zfl5dVR/edit#gid=555512928')
 # código en proceso. Necesito convertir a csv para continuar
-
-
 
 head(peso_seco)
 
@@ -78,37 +65,44 @@ head(tricomas)
 
 
 tricomas$uno <- as.double(tricomas$uno) ##todo esto es para cambiar el
-tricomas$dos <- as.double(tricomas$dos) ##tipo de dato que tenian las var
+tricomas$dos <- as.double(tricomas$dos)  ##tipo de dato que tenian las var
 tricomas$tres <- as.double(tricomas$tres) ##por default al cargar las bd
 tricomas$cuatro <- as.double(tricomas$cuatro)
-tricomas$sitio <- as.character(tricomas$sitio)
+tricomas$sitio <- as.character(tricomas$sitio) 
 tricomas$parche <- as.character(tricomas$parche)
 
 head(tricomas)
+tricomas$leafMean <- rowMeans(subset(tricomas, select = c(uno, dos, tres,cuatro)), na.rm = T)
+
+#graficar los datos
+boxplot(leafMean~ambiente, 
+        data = tricomas,
+        main = "Promedio de tricomas por ambiente",
+        xlab = "ambiente", 
+        ylab = "tricomas")
 
 
-
-#falta la variable "total"
-
-
+boxplot(leafMean~ciudad, 
+        data = tricomas,
+        main = "Promedio de tricomas por ciudad",
+        xlab = "ciudad", 
+        ylab = "tricomas")
 
 
 # calcular Prueba de T entre ambientes
 
-t_test <- t.test(tricomas$total ~ tricomas$ambiente, var.equal = T) 
+t_huanjing <- t.test(tricomas$leafMean ~ tricomas$ambiente, var.equal = T) 
+t_huanjing
 ### https://www.youtube.com/watch?v=NlYgJJR2Qzc   ### virgulilla alt + 126
 
 
-# resumir los datos
-group_by(tricomas, ciudad) %>%
-  summarise(
-    count = n(),
-    M = mean(total), 
-    SD = sd(total),
-    median = median(total),
-    IQR = IQR(total, na.rm = T)
-  )
+lm_chengshi <- lm(leafMean ~ ciudad, data = tricomas, na.action = na.exclude)
+lm_chengshi
+summary(lm_chengshi)
 
+lm_interaccion <- lm(leafMean ~ ambiente*ciudad, data = tricomas, na.action = na.exclude)
+lm_interaccion
+summary(lm_interaccion)
 
 
 
