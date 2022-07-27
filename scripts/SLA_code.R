@@ -6,6 +6,7 @@
 
 getwd()
 library(readxl)
+peso_seco <- read_xlsx("./db/peso_seco_accesorias.xlsx")
 tricomas <- read_xlsx("./db/TRICOMA_LORENA.xlsx")
 
 #install.packages("googledrive")
@@ -42,20 +43,28 @@ head(peso_seco)
 
 # calcular Prueba de T entre ambientes
 
-t_test <- t.test(peso_seco$sla ~ peso_seco$ambiente, var.equal = T) 
+amb_t_sla <- t.test(peso_seco$sla ~ peso_seco$ambiente, var.equal = T) 
+amb_t_sla
 ### https://www.youtube.com/watch?v=NlYgJJR2Qzc   ### virgulilla alt + 126
 
-                                                
-# resumir los datos
-group_by(peso_seco, ciudad) %>%
-  summarise(
-    count = n(),
-    M = mean(sla), 
-    SD = sd(sla),
-    median = median(sla),
-    IQR = IQR(sla, na.rm = T)
-  )
-    
+# grafica de cajas SLA-ambiente
+boxplot(sla~ambiente, 
+        data = peso_seco,
+        main = "Specific Leaf Area por ambiente",
+        xlab = "ambiente", 
+        ylab = "sla")
+
+# calcular Prueba T entre ciudades
+ciudad_lm_sla <- lm(sla ~ ciudad, data = peso_seco, na.action = na.exclude)
+summary(ciudad_lm_sla)                                                
+
+# grafica de cajas SLA-ciudad
+boxplot(sla~ciudad,
+        data = peso_seco,
+        main = "SLA por ciudad",
+        xlab = "ciudad",
+        ylab = "sla")
+
 
 ###############################################################################
 # RESUMEN DE LA BASE DE DATOS CON TRICOMAS DE PLANTAS DE CAMPO DE R.nudiflora
@@ -73,6 +82,7 @@ tricomas$parche <- as.character(tricomas$parche)
 
 head(tricomas)
 tricomas$leafMean <- rowMeans(subset(tricomas, select = c(uno, dos, tres,cuatro)), na.rm = T)
+head(tricomas)
 
 #graficar los datos
 boxplot(leafMean~ambiente, 
