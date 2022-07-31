@@ -22,6 +22,12 @@ head(peso_seco)
 
 library(dplyr)
 
+peso_seco$ciudad <- as.factor(peso_seco$ciudad)
+peso_seco$ambiente <- as.factor(peso_seco$ambiente)
+peso_seco$sitio <- as.factor(peso_seco$sitio)
+peso_seco$parche <- as.factor(peso_seco$parche)
+peso_seco$planta <- as.factor(peso_seco$planta)
+
 peso_seco$ind1_gr <- as.double(peso_seco$ind1_gr) ##todo esto es para cambiar el
 peso_seco$ind2_gr <- as.double(peso_seco$ind2_gr) ##tipo de dato que tenian las var
 peso_seco$ind3_gr <- as.double(peso_seco$ind3_gr) ##por default al cargar las bd
@@ -29,6 +35,7 @@ peso_seco$ind4_gr <- as.double(peso_seco$ind4_gr)
 peso_seco$ind5_gr <- as.double(peso_seco$ind5_gr)
 peso_seco$sitio <- as.character(peso_seco$sitio)
 peso_seco$parche <- as.character(peso_seco$parche)
+
 
 head(peso_seco)
 
@@ -53,6 +60,22 @@ boxplot(sla~ambiente,
         main = "Specific Leaf Area por ambiente",
         xlab = "ambiente", 
         ylab = "sla")
+
+# quiero saber cuales son los puntos que sobresalen del ambiente urbano
+#quantile(peso_seco$sla, na.rm = T) # outliers son mayores de 0.0403
+
+outliers <- peso_seco[order(peso_seco$ambiente, -(peso_seco$sla)), ] # es la 
+# base peso_seco en orden descendente para encontrar el ID de los outliers
+outliers # se abre en la consola y ademas con la fn view. Ahí se ve que los dos valores más altos
+# en los datos urbanos son: mid_u21m2= 0.13483412 y cam_u31m2= 0.07402844
+
+# quitar los outliers mid_u21m2 y cam_u31m2 de la base para volver a hacer la 
+# prueba de t
+
+
+
+
+
 
 # calcular Prueba T entre ciudades
 ciudad_lm_sla <- lm(sla ~ ciudad, data = peso_seco, na.action = na.exclude)
