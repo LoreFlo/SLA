@@ -42,51 +42,73 @@ head(peso_seco)
 peso_seco$promedio <- rowMeans(peso_seco[ ,c(7,8,9,10,11)], na.rm = TRUE)
 head(peso_seco)
 
-# calcular SLA por lugar de colecta
+################## calcular SLA por lugar de colecta ###########################
 ### el área de todas las muestras es la misma = 0.211 cm2
 
 peso_seco <- mutate(peso_seco, sla = promedio/0.211)
 head(peso_seco)
 
-# calcular Prueba de T entre ambientes
-
+### calcular Prueba de T entre ambientes ###########################
 amb_t_sla <- t.test(peso_seco$sla ~ peso_seco$ambiente, var.equal = T) 
 amb_t_sla
 ### https://www.youtube.com/watch?v=NlYgJJR2Qzc   ### virgulilla alt + 126
 
 # grafica de cajas SLA-ambiente
-boxplot(sla~ambiente, 
+caja_sla_amb<-boxplot(sla~ambiente, 
         data = peso_seco,
         main = "Specific Leaf Area por ambiente",
         xlab = "ambiente", 
         ylab = "sla")
 
-# quiero saber cuales son los puntos que sobresalen del ambiente urbano
-#quantile(peso_seco$sla, na.rm = T) # outliers son mayores de 0.0403
+### ver los outliers, forma 1:
+outliers <- peso_seco[order(peso_seco$ambiente, -(peso_seco$sla)), ] ### es la 
+### base peso_seco en orden descendente para encontrar el ID de los outliers
+outliers ### se abre en la consola y ademas con la fn view. Ahí se ve que los dos valores más altos
+### en los datos urbanos son: mid_u21m2= 0.13483412 y cam_u31m2= 0.07402844
 
-outliers <- peso_seco[order(peso_seco$ambiente, -(peso_seco$sla)), ] # es la 
-# base peso_seco en orden descendente para encontrar el ID de los outliers
-outliers # se abre en la consola y ademas con la fn view. Ahí se ve que los dos valores más altos
-# en los datos urbanos son: mid_u21m2= 0.13483412 y cam_u31m2= 0.07402844
+### ver los outliers, forma 2:
+caja_sla_amb$out #para ver los outliers más fácil -.-
+peso_seco_out <- peso_seco
+peso_seco_out <- peso_seco_out[!(peso_seco_out$sla %in% caja_sla_amb$out), ]
+caja_sla <-boxplot(sla~ambiente, 
+                      data = peso_seco_out,
+                      main = "Specific Leaf Area por ambiente",
+                      xlab = "ambiente", 
+                      ylab = "sla")
 
-# quitar los outliers mid_u21m2 y cam_u31m2 de la base para volver a hacer la 
-# prueba de t
+# calcular Prueba de T entre ambientes con la base sin outliers
+amb_t_sla2 <- t.test(peso_seco_out$sla ~ peso_seco_out$ambiente, var.equal = T) 
+amb_t_sla2
 
 
-
-
-
-
-# calcular Prueba T entre ciudades
+# ajustar modelo lineal entre ciudades ########################################
 ciudad_lm_sla <- lm(sla ~ ciudad, data = peso_seco, na.action = na.exclude)
 summary(ciudad_lm_sla)                                                
 
-# grafica de cajas SLA-ciudad
-boxplot(sla~ciudad,
+# grafica de caja SLA-ciudad
+caja_sla_ciudad <- boxplot(sla~ciudad,
         data = peso_seco,
         main = "SLA por ciudad",
         xlab = "ciudad",
         ylab = "sla")
+
+# ver outliers 
+caja_sla_ciudad$out #resultado: 0.07402844, 0.05943128, 0.05545024, 0.06085308, 0.13483412 
+# cam, cun, cun, cun, mid, respectivamente.
+
+# quitar outliers de la base y volver a graficar
+peso_seco_out2 <- peso_seco
+peso_seco_out2 <- peso_seco_out2[!(peso_seco_out2$sla %in% caja_sla_ciudad$out), ]
+caja_sla_ciudad2 <- boxplot(sla~ciudad,
+                           data = peso_seco_out2,
+                           main = "SLA por ciudad",
+                           xlab = "ciudad",
+                           ylab = "sla")
+
+# con la base sin outliers, volver a ajustar a modelo lineal
+ciudad_lm_sla2 <- lm(sla ~ ciudad, data = peso_seco_out2, na.action = na.exclude)
+summary(ciudad_lm_sla2)
+
 
 
 ###############################################################################
