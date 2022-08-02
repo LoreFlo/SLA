@@ -21,6 +21,7 @@ head(peso_seco)
 # Calcular promedio del peso por lugar de colecta 
 
 library(dplyr)
+library(tidyr)
 
 peso_seco$ciudad <- as.factor(peso_seco$ciudad)
 peso_seco$ambiente <- as.factor(peso_seco$ambiente)
@@ -33,8 +34,6 @@ peso_seco$ind2_gr <- as.double(peso_seco$ind2_gr) ##tipo de dato que tenian las 
 peso_seco$ind3_gr <- as.double(peso_seco$ind3_gr) ##por default al cargar las bd
 peso_seco$ind4_gr <- as.double(peso_seco$ind4_gr)
 peso_seco$ind5_gr <- as.double(peso_seco$ind5_gr)
-peso_seco$sitio <- as.character(peso_seco$sitio)
-peso_seco$parche <- as.character(peso_seco$parche)
 
 
 head(peso_seco)
@@ -61,9 +60,9 @@ caja_sla_amb<-boxplot(sla~ambiente,
         ylab = "sla")
 
 ### ver los outliers, forma 1:
-outliers <- peso_seco[order(peso_seco$ambiente, -(peso_seco$sla)), ] ### es la 
+#outliers <- peso_seco[order(peso_seco$ambiente, -(peso_seco$sla)), ] ### es la 
 ### base peso_seco en orden descendente para encontrar el ID de los outliers
-outliers ### se abre en la consola y ademas con la fn view. Ahí se ve que los dos valores más altos
+#outliers ### se abre en la consola y ademas con la fn view. Ahí se ve que los dos valores más altos
 ### en los datos urbanos son: mid_u21m2= 0.13483412 y cam_u31m2= 0.07402844
 
 ### ver los outliers, forma 2:
@@ -77,13 +76,16 @@ caja_sla <-boxplot(sla~ambiente,
                       ylab = "sla")
 
 # calcular Prueba de T entre ambientes con la base sin outliers
-amb_t_sla2 <- t.test(peso_seco_out$sla ~ peso_seco_out$ambiente, var.equal = T) 
-amb_t_sla2
+#amb_t_sla2 <- t.test(peso_seco_out$sla ~ peso_seco_out$ambiente, var.equal = T) 
+#amb_t_sla2
 
 
 # ajustar modelo lineal entre ciudades ########################################
 ciudad_lm_sla <- lm(sla ~ ciudad, data = peso_seco, na.action = na.exclude)
 summary(ciudad_lm_sla)                                                
+
+cd_amb_lm_sla <- lm(sla ~ ciudad*ambiente, data = peso_seco, na.action = na.exclude)
+summary(cd_amb_lm_sla)
 
 # grafica de caja SLA-ciudad
 caja_sla_ciudad <- boxplot(sla~ciudad,
@@ -92,24 +94,34 @@ caja_sla_ciudad <- boxplot(sla~ciudad,
         xlab = "ciudad",
         ylab = "sla")
 
+caja_sla_cd_amb <- boxplot(sla~ciudad*ambiente,
+        data = peso_seco,
+        main = "SLA por ciudad",
+        xlab = "ciudad",
+        ylab = "sla")
+
 # ver outliers 
 caja_sla_ciudad$out #resultado: 0.07402844, 0.05943128, 0.05545024, 0.06085308, 0.13483412 
 # cam, cun, cun, cun, mid, respectivamente.
+caja_sla_cd_amb$out #result: 0.05355450, 0.07402844, 0.13483412
+# tizimin, campeche, merida
 
 # quitar outliers de la base y volver a graficar
-peso_seco_out2 <- peso_seco
-peso_seco_out2 <- peso_seco_out2[!(peso_seco_out2$sla %in% caja_sla_ciudad$out), ]
-caja_sla_ciudad2 <- boxplot(sla~ciudad,
-                           data = peso_seco_out2,
-                           main = "SLA por ciudad",
-                           xlab = "ciudad",
-                           ylab = "sla")
+#peso_seco_out2 <- peso_seco
+#peso_seco_out2 <- peso_seco_out2[!(peso_seco_out2$sla %in% caja_sla_ciudad$out), ]
+#caja_sla_ciudad2 <- boxplot(sla~ciudad, data = peso_seco_out2, main = "SLA por ciudad", xlab = "ciudad", ylab = "sla")
 
 # con la base sin outliers, volver a ajustar a modelo lineal
-ciudad_lm_sla2 <- lm(sla ~ ciudad, data = peso_seco_out2, na.action = na.exclude)
-summary(ciudad_lm_sla2)
+#ciudad_lm_sla2 <- lm(sla ~ ciudad, data = peso_seco_out2, na.action = na.exclude)
+#summary(ciudad_lm_sla2)
 
-
+write.table(
+  peso_seco, 
+  file = "./db/peso_seco.csv",
+  sep = "\t", 
+  col.names = T,
+  row.names = F
+)
 
 ###############################################################################
 # RESUMEN DE LA BASE DE DATOS CON TRICOMAS DE PLANTAS DE CAMPO DE R.nudiflora
@@ -117,47 +129,74 @@ summary(ciudad_lm_sla2)
 
 head(tricomas)
 
+### todo esto es para cambiar la clase que tenias las variables por default
+###a la hora de cargar las bases de datos
+tricomas$ciudad <- as.factor(tricomas$ciudad)
+tricomas$ambiente <- as.factor(tricomas$ambiente)
+tricomas$sitio <- as.factor(tricomas$sitio)
+tricomas$parche <- as.factor(tricomas$parche)
+tricomas$planta <- as.factor(tricomas$planta)
 
-tricomas$uno <- as.double(tricomas$uno) ##todo esto es para cambiar el
-tricomas$dos <- as.double(tricomas$dos)  ##tipo de dato que tenian las var
-tricomas$tres <- as.double(tricomas$tres) ##por default al cargar las bd
+tricomas$uno <- as.double(tricomas$uno)
+tricomas$dos <- as.double(tricomas$dos)  
+tricomas$tres <- as.double(tricomas$tres) 
 tricomas$cuatro <- as.double(tricomas$cuatro)
-tricomas$sitio <- as.character(tricomas$sitio) 
-tricomas$parche <- as.character(tricomas$parche)
-
 head(tricomas)
+
+# la columna leaf es un individuo; del uno al cuatro, son conteos de tricomas en 
+# hojas de cada individuo. 
+# En esta sección se hará el promedio de tricomas de cada individuo en leaf
 tricomas$leafMean <- rowMeans(subset(tricomas, select = c(uno, dos, tres,cuatro)), na.rm = T)
 head(tricomas)
 
 #graficar los datos
-boxplot(leafMean~ambiente, 
+caja_tric_amb <- boxplot(leafMean~ambiente, 
         data = tricomas,
         main = "Promedio de tricomas por ambiente",
         xlab = "ambiente", 
         ylab = "tricomas")
+caja_tric_amb$out
 
 
-boxplot(leafMean~ciudad, 
+caja_tric_cd <- boxplot(leafMean~ciudad, 
         data = tricomas,
         main = "Promedio de tricomas por ciudad",
         xlab = "ciudad", 
         ylab = "tricomas")
+caja_tric_cd$out # hay muchos outlier tanto si se ven los datos agrupados por ciudad como por ambiente.
+# tal vez habrá que transformarlos
 
 
-# calcular Prueba de T entre ambientes
+# calcular Prueba de T entre ambientes ############################################
 
-t_huanjing <- t.test(tricomas$leafMean ~ tricomas$ambiente, var.equal = T) 
-t_huanjing
-### https://www.youtube.com/watch?v=NlYgJJR2Qzc   ### virgulilla alt + 126
+t_tric_amb <- t.test(tricomas$leafMean ~ tricomas$ambiente, var.equal = T) 
+t_tric_amb
+### virgulilla alt + 126
 
 
-lm_chengshi <- lm(leafMean ~ ciudad, data = tricomas, na.action = na.exclude)
-lm_chengshi
-summary(lm_chengshi)
+# ajustar modelo lineal a los tricomas entre ciudades y amb*cd #############################
+
+lm_tric_cd <- lm(leafMean ~ ciudad, data = tricomas, na.action = na.exclude)
+summary(lm_tric_cd)
 
 lm_interaccion <- lm(leafMean ~ ambiente*ciudad, data = tricomas, na.action = na.exclude)
-lm_interaccion
 summary(lm_interaccion)
+
+# arreglar el ID
+
+tricomas <- tricomas %>% mutate(ciudad2 = ciudad)
+tricomas <- unite(tricomas, ciudad2, ID, col= "ID", sep="_")
+
+
+# guardar la base tricomas con la columna nueva leafMean y el ID arreglado
+
+write.table(tricomas, "./db/tricomas.csv", sep = "\t", col.names = T, row.names = F)
+
+
+######### explorando diferencias entre sitio, parche y planta #######################
+
+peso_seco 
+
 
 
 
