@@ -118,7 +118,7 @@ caja_sla_cd_amb$out #result: 0.05355450, 0.07402844, 0.13483412
 write.table(
   peso_seco, 
   file = "./db/peso_seco.csv",
-  sep = "\t", 
+  sep = ",", 
   col.names = T,
   row.names = F
 )
@@ -190,13 +190,57 @@ tricomas <- unite(tricomas, ciudad2, ID, col= "ID", sep="_")
 
 # guardar la base tricomas con la columna nueva leafMean y el ID arreglado
 
-write.table(tricomas, "./db/tricomas.csv", sep = "\t", col.names = T, row.names = F)
+write.table(
+  tricomas, "./db/tricomas.csv", 
+  sep = ",", 
+  col.names = T, row.names = F)
 
 
 ######### explorando diferencias entre sitio, parche y planta #######################
+library(ggplot2)
 
-peso_seco 
+ps <- read.csv(file = './db/peso_seco.csv')
+tric <- read.csv(file = "./db/tricomas.csv")
+
+# desplegar heatmap (porque sí se observaron diferencias entre sitios, etc)
+# forma 1
+ggplot(ps, aes(ambiente, planta, fill= sla)) + #probar cambiando los dos primeros campos
+  geom_tile() +
+  scale_fill_gradient(low = "yellow", high = "red")
+
+# forma 2
+# preparar set de datos
+data <- read.table(file = "./db/peso_seco.csv",
+                 sep = ",",
+                 header = T)
+data
+rownames(data) <- data[ ,6] # extraer toda la columna 6 y que la asigne como nombre
+# filas de los datos
+rownames(data)
+samp2 <- data[ ,-6] # eliminar la columna 6
+samp2
+mat_data <- data.matrix(samp2[ ,1:ncol(samp2)]) # objeto para contener el set de 
+# datos en una matriz
+library(pheatmap)
+require(ggplot2)
+library(colorspace)
+require(colorspace)
+library(grid)
+
+pheatmap(mat_data, fontsize_row = 5, fontsize_col = 5)
 
 
+# sla - sitio
+ps$sitio <- as.factor(ps$sitio)
+lm_sla_sitio <- lm(sla ~ sitio, data = ps, na.action = na.exclude)
+summary(lm_sla_sitio)
 
+# sla - parche
 
+# sla - parche*planta
+
+# tricomas - sitio
+
+# tricomas - parche
+
+# tricomas - parche*planta
