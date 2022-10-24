@@ -202,6 +202,11 @@ library(ggplot2)
 ps <- read.csv(file = './db/peso_seco.csv')
 tric <- read.csv(file = "./db/tricomas.csv")
 
+install.packages("xlsx")
+library(xlsx)
+
+write.
+
 # desplegar heatmap (porque sí se observaron diferencias entre sitios, etc)
 # forma 1
 ggplot(ps, aes(ambiente, planta, fill= sla)) + #probar cambiando los dos primeros campos
@@ -244,3 +249,4 @@ summary(lm_sla_sitio)
 # tricomas - parche
 
 # tricomas - parche*planta
+
