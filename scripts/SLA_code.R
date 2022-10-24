@@ -43,8 +43,11 @@ head(peso_seco)
 
 ################## calcular SLA por lugar de colecta ###########################
 ### el área de todas las muestras es la misma = 0.211 cm2
+### sla es la razón: area de hoja / masa seca ; Jennifer Firn et al. 2019
+### https://www.nature.com/articles/s41559-018-0790-1
 
-peso_seco <- mutate(peso_seco, sla = promedio/0.211)
+peso_seco <- mutate(peso_seco, sla = 0.211/promedio)
+peso_seco <- rename(peso_seco, ID = id)
 head(peso_seco)
 
 ### calcular Prueba de T entre ambientes ###########################
@@ -96,7 +99,7 @@ caja_sla_ciudad <- boxplot(sla~ciudad,
 
 caja_sla_cd_amb <- boxplot(sla~ciudad*ambiente,
         data = peso_seco,
-        main = "SLA por ciudad",
+        main = "SLA por ciudad por ambiente",
         xlab = "ciudad",
         ylab = "sla")
 
@@ -205,7 +208,6 @@ tric <- read.csv(file = "./db/tricomas.csv")
 install.packages("xlsx")
 library(xlsx)
 
-write.
 
 # desplegar heatmap (porque sí se observaron diferencias entre sitios, etc)
 # forma 1
