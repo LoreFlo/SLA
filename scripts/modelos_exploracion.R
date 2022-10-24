@@ -46,6 +46,10 @@ summary(prueba1)
 
 prueba2 <- lm(log(peso_seco$sla)~prom_tri$tricomas)
 summary(prueba2)
-# 1% de la variabilidad de los tricomas se explia por el peso seco.
-
+# residuals: la mediana está cerca del cero, parece que el cuartil 1 y 3 estan equidistantes.
+# el modelo tiene intercepto (por eso salio significativo, lo cual es importante si me interesa hacer un modelo predictivo)
+# el peso seco es marginalmente significativo (p>0.05)
+# 2% de la variabilidad de los tricomas se explica por el peso seco (Multiple R-squared:  0.020).
 anova(prueba2)
+# sale el mismo vaor de F
+confint(prueba2)
