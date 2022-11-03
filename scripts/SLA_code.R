@@ -8,13 +8,14 @@ getwd()
 library(readxl)
 peso_seco <- read_xlsx("./db/peso_seco_accesorias.xlsx")
 tricomas <- read_xlsx("./db/TRICOMA_LORENA.xlsx")
+nutri <- read_xlsx("./db/macronutrientes_vegetales.xlsx")
 
 #install.packages("googledrive")
 #install.packages("googlesheets4")
 #library(googlesheets4)
 #leer base de datos desde un google sheet
 #x <- read_sheet('https://docs.google.com/spreadsheets/d/15qjj8LPQstf_vaI0A3xTrmIB4Zfl5dVR/edit#gid=555512928')
-# código en proceso. Necesito convertir a csv para continuar
+# código en proceso
 
 head(peso_seco)
 
@@ -251,4 +252,44 @@ summary(lm_sla_sitio)
 # tricomas - parche
 
 # tricomas - parche*planta
+
+###############################################################################
+# RESUMEN DE LA BASE DE DATOS CON MACRONUTRIENTES DE PLANTAS DE CAMPO DE R.nudiflora
+###############################################################################
+
+head(nutri)
+
+
+nutri$ciudad <- as.factor(nutri$ciudad)
+nutri$ambiente <- as.factor(nutri$ambiente)
+nutri$sitio <- as.factor(nutri$sitio)
+nutri$parche <- as.factor(nutri$parche)
+nutri$planta <- as.factor(nutri$planta)
+
+nutri$P_mg_Kg <- as.double(nutri$P_mg_Kg) ##todo esto es para cambiar el
+nutri$C_porcentaje <- as.double(nutri$C_porcentaje) ##tipo de dato que tenian las var
+nutri$K_Cmol_Kg <- as.double(nutri$K_Cmol_Kg) ##por default al cargar las bd
+nutri$N_porcentaje <- as.double(nutri$N_porcentaje)
+
+head(nutri)
+
+# guardar la base tricomas con la columna nueva leafMean y el ID arreglado
+
+write.table(
+  nutri , "./db/npk.csv", 
+  sep = ",", 
+  col.names = T, row.names = F)
+
+npk <- read.csv(file = './db/npk.csv')
+
+head(npk)
+
+
+
+
+
+
+
+
+
 
