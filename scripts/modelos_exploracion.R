@@ -1,7 +1,7 @@
 # Cargar bases
 
 getwd()
-library(readxl)
+#library()
 
 if(!require(tidyverse)){install.packages("tidyverse")}; library(tidyverse)
 ### es una funcion util para instalar y cargar paketes que se pueden necesitar o no. 
@@ -55,14 +55,17 @@ qqnorm(npk$C_porcentaje)
 qqnorm(npk$N_porcentaje)
 
 
-########## Linear Regresion ##########
+########## Gráfica de dispersión ##########
 
 plot(npk$C_porcentaje, log(peso_seco$sla))
+plot(npk$N_porcentaje, log(peso_seco$sla))
 
 # grafico de correlaciones
 c1<-cor(npk[,9:12])
+
 corrplot(c1)
 
+########## Linear Regresion ##########
 
 prueba1 <- glm(log(peso_seco$sla)~prom_tri$tricomas)
 summary(prueba1)
@@ -78,3 +81,5 @@ anova(prueba2)
 
 #pairs.panels() para visualizar multiples datos
 
+prueba3 <- glm(log(peso_seco$sla)~)
+summary(prueba1)

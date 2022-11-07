@@ -284,10 +284,28 @@ npk <- read.csv(file = './db/npk.csv')
 
 head(npk)
 
+#################### UNIFICACION DE BASES #################################
+
+cap1 <- read.csv("./db/capitulo1.csv")
+
+cap1$ciudad <- as.factor(cap1$ciudad)
+cap1$ambiente <- as.factor(cap1$ambiente)
+cap1$sitio <- as.factor(cap1$sitio)
+cap1$parche <- as.factor(cap1$parche)
+cap1$planta <- as.factor(cap1$planta)
+
+cap1$ind1_gr <- as.double(cap1$ind1_gr) ##todo esto es para cambiar el
+cap1$ind2_gr <- as.double(cap1$ind2_gr) ##tipo de dato que tenian las var
+cap1$ind3_gr <- as.double(cap1$ind3_gr) ##por default al cargar las dbs
+cap1$ind4_gr <- as.double(cap1$ind4_gr)
+cap1$ind5_gr <- as.double(cap1$ind5_gr)
 
 
 
-
+cap1$P_mg_Kg <- as.double(cap1$P_mg_Kg) ##todo esto es para cambiar el
+cap1$C_porcentaje <- as.double(cap1$C_porcentaje) ##tipo de dato que tenian las var
+cap1$K_Cmol_Kg <- as.double(cap1$K_Cmol_Kg) ##por default al cargar las bd
+cap1$N_porcentaje <- as.double(cap1$N_porcentaje)
 
 
 
