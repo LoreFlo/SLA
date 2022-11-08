@@ -300,7 +300,9 @@ cap1$ind3_gr <- as.double(cap1$ind3_gr) ##por default al cargar las dbs
 cap1$ind4_gr <- as.double(cap1$ind4_gr)
 cap1$ind5_gr <- as.double(cap1$ind5_gr)
 
-
+cap1$promedio <- as.double(cap1$promedio)
+cap1$sla <- as.double(cap1$sla)
+cap1$tricomas <- as.double(cap1$tricomas)
 
 cap1$P_mg_Kg <- as.double(cap1$P_mg_Kg) ##todo esto es para cambiar el
 cap1$C_porcentaje <- as.double(cap1$C_porcentaje) ##tipo de dato que tenian las var
@@ -308,6 +310,15 @@ cap1$K_Cmol_Kg <- as.double(cap1$K_Cmol_Kg) ##por default al cargar las bd
 cap1$N_porcentaje <- as.double(cap1$N_porcentaje)
 
 
+write.table(
+  cap1, "./db/cap1_str.csv", 
+  sep = ",", 
+  col.names = T, row.names = F)
 
+cap1_1 <- read.csv(file = './db/cap1_str.csv')
 
+head(cap1_1)
 
+str(cap1_1) # no se guardó la str en el cvs :(
+
+str(cap1)

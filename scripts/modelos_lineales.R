@@ -1,16 +1,17 @@
-#####ADVERTENCIA: para usar este codigo necesito cambiar las variables del primer modelo pero no lo haré ahorita
 
 # Cargar bases
 
 #getwd()
-#library()
 
 if(!require(tidyverse)){install.packages("tidyverse")}; library(tidyverse)
+library(corrplot)
+library(lmtest)
 ### es una funcion util para instalar y cargar paketes que se pueden necesitar o no. 
 
-peso_seco <- read.csv("./db/peso_seco.csv")
+peso_seco <- read.csv("./db/peso_seco.csv", colClasses = c("ciudad"="factor", "ambiente"="factor", "sitio"="factor", "parche"="factor"))
+
 #tricomas <- read.csv("./db/tricomas.csv") #esta base se modificó y mas adelante se abre la version que sirve para este script
-npk <- read.csv(file = './db/npk.csv')
+npk <- read.csv(file = './db/npk.csv', colClasses = c("ciudad"="factor", "ambiente"="factor", "sitio"="factor", "parche"="factor"))
 
 
 #################################################################################
@@ -39,7 +40,8 @@ qqnorm(log(peso_seco$sla))
 #  sep = ",", 
 #  col.names = T, row.names = F)
 
-trico <- read.csv("./db/prom_tricomas.csv")
+trico <- read.csv("./db/prom_tricomas.csv", colClasses = c("ciudad"="factor", "ambiente"="factor"))
+str(trico)
 hist(log(trico$tricomas)) #con log queda menos sesgada la distribucion
 qqnorm(log(trico$tricomas))
 
@@ -65,13 +67,18 @@ plot(npk$C_porcentaje, log(peso_seco$sla))
 plot(npk$N_porcentaje, log(peso_seco$sla))
 
 
-# grafico de correlaciones
-c1<-cor(npk[,9:12], use = "complete.obs")
+####################  GRAFICO DE CORRELACIONES  ############################### 
+# https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html
+
+cap1 <- read.csv("./db/cap1_str.csv", colClasses = c("ciudad"="factor", "ambiente"="factor", "sitio"="factor", "parche"="factor"))
+c1<-cor(cap1[,13:18], use = "complete.obs")
 c1
-#corrplot(c1)  #falta abrir paqute, no se cual es.
+corrplot(c1, method = "number")  # si está muy bajito el color de los numeros, quitar method
 
-
+######################################
 ########## Linear Regresion ##########
+######################################
+
 # regresion lineal <- dependiente (cuantitativa continua); independiente (mixtas)
 # objetivo: predecir la variable depediente Y en funcion de un conjunto de variables independientes Xj
 # funcion liga <- identidad, gaussiana
@@ -106,6 +113,7 @@ m_a #coeficientes: intercept 3.3045; ambienteu 0.2746
 anova(m_a)
 #anova descompone la variabilidad, por ejemplo la var que predice el valor de sla
 # y la que no predice (variabilidad residual; residual standard error)
+
 confint(m_a) # da los intervalos de confianza del beta0 y beta1.
 # En summary obtenemos los valores de beta cuando los predictores son cero. beta0 es igual a Y cuando x1 es 0
 #nd<-data.frame(peso_seco$sla = c(70,90))
@@ -124,14 +132,13 @@ m_ac
 summary(m_ac)
 # mediana negativa, q 1 y 3 no son equidistantes
 # coeficiente beta para ambienteU y para ciudadcam 
-# es estadísticamente significativo con un alfa de 0.001
+# ambienteU, ciudadCam, estadísticamente significativo con un alfa de 0.001
 # Adjusted R-squared:  0.2153 
 # F-statistic: 9.011, p-value: 1.883e-07
 
 ########### Contribuira mucho la var. ciudad o no? Comparar modelos con anova #####
 
-anova(m_a, m_ac) # deberia dar una tabla de analisis de varianza comparando modelos, pero no me salió
-
+anova(m_a, m_ac) # deberia dar una tabla de analisis de varianza comparando modelos. NO ME SALE.
 # está comparando si la diferencia en la suma de cuadrados es estadisticamente 
 # significativa. El modelo que sale significativo es mejor que el otro en términos de 
 # disminucion de l suma de cuadrados.
