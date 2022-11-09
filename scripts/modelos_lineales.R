@@ -213,13 +213,19 @@ summary(t_acac)
 # F-statistic: 12.74 on 9 and 133 DF,  p-value: 1.832e-14
 
 
+#####################  PLANT C/N RATIO  #########################
+plot(cap1$C_porcentaje, cap1$N_porcentaje)
+hist(log(cap1$CN_ratio))
+cn_a <- lm(log(CN_ratio)~ambiente, data = cap1)
+summary(cn_a)
 
 
+cn_ac <- lm(log(CN_ratio)~ambiente+ciudad, data = cap1)
+summary(cn_ac)
 
 
-
-
-
+cn_acac <- lm(log(CN_ratio)~ambiente+ciudad+(ambiente*ciudad), data = cap1)
+summary(cn_acac)
 
 
 
