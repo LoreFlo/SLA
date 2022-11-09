@@ -17,10 +17,9 @@ library(performance) # para comparar modelos
 #compare_performance(modelo 1, modelo 2,... modelo n)
 library(ggplot2)
 
-cap1 <- read.csv("./db/cap1_str.csv")
+cap1 <- read.csv("./db/cap1_str.csv", colClasses = c("ciudad"="factor", "ambiente"="factor", "sitio"="factor", "parche"="factor"))
 str(cap1)
-cap1<-(as.data.frame(unclass(cap1),
-                     stringsAsFactors=T))
+
 
 ## inspeccionar los datos
 
