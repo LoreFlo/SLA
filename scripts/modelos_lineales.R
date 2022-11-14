@@ -73,7 +73,7 @@ library(lmtest)
 cap1 <- read.csv("./db/cap1_str.csv", colClasses = 
                    c("ciudad"="factor", "ambiente"="factor", "sitio"="factor", "parche"="factor",
                      "sla"="double"))
-c1<-cor(cap1[,13:18], use = "complete.obs")
+c1<-cor(cap1[,13:21], use = "complete.obs")
 c1
 corrplot(c1, method = "number")  # si está muy bajito el color de los numeros, quitar method
 
@@ -218,15 +218,40 @@ plot(cap1$C_porcentaje, cap1$N_porcentaje)
 hist(log(cap1$CN_ratio))
 cn_a <- lm(log(CN_ratio)~ambiente, data = cap1)
 summary(cn_a)
-
+## residuals: med no mu cerca del 0 y Q1y3 maso desiguales
+## sale p<0.001 en el intercepto (ambiente rural??)
+## Rsq =0.0085
 
 cn_ac <- lm(log(CN_ratio)~ambiente+ciudad, data = cap1)
 summary(cn_ac)
+## residuals: med cerca del 0 y Q1y3 maso iguales
+## p<0.001 ambiente R, cun, mid, val
+## Rsq = 0.2589
 
 
 cn_acac <- lm(log(CN_ratio)~ambiente+ciudad+(ambiente*ciudad), data = cap1)
 summary(cn_acac)
+## residuals: med no cerca del 0, y Q1y3 desiguales
+## p<0.001 ambR, cun, mid, val
+## Rsq = 0.2527
 
+##################### C y N PLANTA VS SUELO ##########################
+## cs = carbono del suelo; a= ambiente
+plot(cap1$C_porc_suelo, cap1$C_porcentaje)
+plot(cap1$N_porc_suelo, cap1$N_porcentaje)
 
+cube_cs <- ((cap1$C_porc_suelo)^ (1/3))
+hist(cube_cs)
+cs_a <- lm(cube_cs~ambiente, data = cap1)
+summary(cs_a)
+## residuals parecen normales
+## los dos ambientes salen significativos
+## Rsqr = 0.04249
 
-
+cube_ns <- ((cap1$N_porc_suelo)^(1/3))
+hist(cube_ns)
+ns_a <- lm(cube_ns~ambiente, data = cap1)
+summary(ns_a)
+## residuals parecen normales
+## los dos ambientes son significativos
+## Rsqr = 0.08445
